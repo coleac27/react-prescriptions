@@ -1,0 +1,59 @@
+/* Home */
+#home, #resources {
+  background: rgb(0,101,219);
+  background: linear-gradient(90deg, rgb(0,101,219) 50%, rgba(0,212,255,1) 100%);
+  min-height: 500px;
+}
+
+/* Cards */
+.card {
+  transition: all o.5s ease;
+}
+.card:hover {
+  cursor: pointer;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)
+}
+
+/* Medline */
+.summary {
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.summary p {
+  margin-bottom: 1em;
+}
+
+.summary ul, 
+.summary ol {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.summary li {
+  margin-bottom: 0.5em;
+}
+
+.summary a {
+  display: inline-block;
+  color: rgba(33, 37, 41, .75);
+  text-decoration: underline;
+  border-radius: 4px;
+}
+
+a:hover {
+  background-color: #0052a3;
+}
+
+.resourceList {
+  list-style: none;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+h3 h4 {
+  color: #333;
+  margin-bottom: 1rem;
+}
