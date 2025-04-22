@@ -1,8 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-require('dotenv').config();
+// const jwt = require('jsonwebtoken');
+// const cookieParser = require('cookie-parser');
 
+// Configure env file & require connection file
+require('dotenv').config();
+//require('./db/conn');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,6 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('Hello from the server!');
+});
+
 app.get('/api/medication', async (req, res) => {
   try {
     const response = await axios.get('https://connect.medlineplus.gov/service', {
@@ -28,9 +36,7 @@ app.get('/api/medication', async (req, res) => {
   } catch (error) {
     console.error('Server error:', error);
     res.status(500).send(error.message);
-  }
-
-  
+  }  
 });
 
 // Start server

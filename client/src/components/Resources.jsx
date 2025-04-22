@@ -31,15 +31,9 @@ export default function Resources() {
   
     console.log('Request URL:', XMLData); // Add this to debug
 
-    axios.get(XMLData, {
-      // headers: {  // Fix: Use headers property
-      //   "Content-Type": "application/xml; charset=utf-8",
-      //   "Access-Control-Allow-Origin": "*"
-      // }
-    })
+    axios.get(XMLData)
     .then((response) => {
       console.log('Your xml response', response.data);
-      //const medicineJSON = xmlToJSON();
       setMedication(response.data);
     }).catch((error) => {  // Add error handling
         setError('Error fetching medication data');
