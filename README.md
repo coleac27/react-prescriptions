@@ -1,5 +1,10 @@
 # New React Project: Prescription Tracker (In Progress)
-## Firebase Authentication
+## Tasks:
+### remove id display
+### add medline to dashboard
+### host on heroku
+
+
 
 ## Getting Started with Create React App
 

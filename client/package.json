@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "server": "node ../server/proxy-server.js",
+    "server": "cd ../server && node proxy-server.js",
     "dev": "concurrently \"npm run server\" \"npm start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",

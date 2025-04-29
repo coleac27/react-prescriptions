@@ -1,12 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
-// const jwt = require('jsonwebtoken');
-// const cookieParser = require('cookie-parser');
-
-// Configure env file & require connection file
-require('dotenv').config();
-//require('./db/conn');
+import 'dotenv/config.js';
+import express from 'express';
+import cors from 'cors';
+import axios from 'axios';
+import medications from './routes/medication.js';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -14,6 +10,7 @@ const port = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/medication", medications);
 
 // Routes
 app.get('/', (req, res) => {
