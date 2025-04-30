@@ -1,13 +1,14 @@
 import { NavLink, Navigate, Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/authContext';
+import MedlineModal from './MedlineModal';
 
 const Medication= (props) => (
   <tr className="">
-    <td className="">
+    {/* <td className="">
       {props.medication._id}
-    </td>
-    <td className="">
+    </td> */}
+    <td className="" role="button" onClick={() => props.setIsModalOpen(true)}>
       {props.medication.medicationName}
     </td>
     <td className="">
@@ -39,6 +40,12 @@ const Medication= (props) => (
         >
           Delete
         </button>
+        {/* <button onClick={() => props.setIsModalOpen(true)}>Open Modal</button> */}
+          <MedlineModal 
+            isModalOpen={props.isModalOpen}
+            onClose={() => props.setIsModalOpen(false)}
+            medicationName={props.medication.medicationName}
+          />
       </div>
     </td>
   </tr>
@@ -47,6 +54,7 @@ const Medication= (props) => (
 
 export default function Dashboard() {
   const [medications, setMedications] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     async function getMedications() {
@@ -75,11 +83,12 @@ export default function Dashboard() {
   // This method will map out the records on the table
   function medicationList() {
     //if(medications.length === 0)
-    console.log("Hi", medications)
     return medications.map((medication) => {
       return (
         <Medication
           medication={medication}
+          isModalOpen={isModalOpen} 
+          setIsModalOpen={setIsModalOpen}
           deleteMedication={() => deleteMedication(medication._id)}
           key={medication._id}
         />
@@ -91,7 +100,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      {!userLoggedIn && (<Navigate to={'/login'} replace={true} />)}
+      {/* {!userLoggedIn && (<Navigate to={'/login'} replace={true} />)} */}
       <div className="container-fluid mb-5">
         <div className="row">
           {/* <nav id="sidebardMenu" className="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
@@ -128,7 +137,7 @@ export default function Dashboard() {
               </div>
               <div className="col-md-6 d-flex justify-content-end">
                 <Link className="btn btn-outline-primary ms-auto px-4 rounded-pill" to="/dashboard/create">
-                  Create Employee
+                  Add New Medication
                 </Link>
               </div>
             </div>
@@ -136,8 +145,8 @@ export default function Dashboard() {
               <table className= "table table-striped table-hover">
                 <thead>
                 <tr className="">
-                    <th className="">#</th>
-                    <th className="">Medication</th>
+                    {/* <th className="">#</th> */}
+                    <th className="">Medication <br /><span className="fw-light">Click for details!</span></th>
                     <th className="">Time of Day</th>
                     <th className="">Dosage</th>
                     <th className="">Pharmacy</th>

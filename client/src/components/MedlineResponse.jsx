@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Medline (props) {
+export default function MedlineResponse (props) {
 
 
   console.log("props",props.medication)

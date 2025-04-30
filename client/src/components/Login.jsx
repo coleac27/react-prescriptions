@@ -66,7 +66,7 @@ export default function Login() {
             <h1 className="display-4 fw-bolder">Welcome Back</h1>
             <p className="lead text-center">Sign in to your account to continue</p>
             <h5 className= "mb-4">OR</h5>
-            <NavLink to="/register" className="btn btn-outline-light rounded-pill pb-2 w-50">Register</NavLink>
+            <NavLink to="/register" className="btn btn-outline-light rounded-pill pb-2 w-50"><i className="fa fa-user-plus me-2"></i>Register</NavLink>
           </div>
           <div className="col-md-6 p-5">
             <h1 className="display-6 fw-bolder mb-5">Login</h1>
@@ -82,7 +82,7 @@ export default function Login() {
               {errorMessage && (
                 <span className='text-red-600 font-bold'>{errorMessage}</span>
               )}
-              <button type="submit" disabled={isSigningIn} className="btn btn-outline-primary rounded-pill w-100 mt-4">Login</button>
+              <button type="submit" disabled={isSigningIn} className="btn btn-outline-primary rounded-pill w-100 mt-4"><i className="fa fa-sign-in me-2"></i>Login</button>
             </form>
             <div className="fw-bolder text-center mt-3">OR</div>
             <div className="text-center mt-3">

@@ -62,7 +62,7 @@ export default function Register() {
             <h1 className="display-4 fw-bolder">Hello</h1>
             <p className="lead text-center">Enter your details to register</p>
             <h5 className= "mb-4">OR</h5>
-            <NavLink to="/login" className="btn btn-outline-light rounded-pill pb-2 w-50">Login</NavLink>
+            <NavLink to="/login" className="btn btn-outline-light rounded-pill pb-2 w-50"><i className="fa fa-sign-in me-2"></i>Login</NavLink>
           </div>
           <div className="col-md-6 p-5">
             <h1 className="display-6 fw-bolder mb-5">Register</h1>
@@ -78,7 +78,7 @@ export default function Register() {
               {errorMessage && (
                   <span className='text-red-600 font-bold'>{errorMessage}</span>
               )}
-              <button type="submit" disabled={isRegistering} className={`btn btn-outline-primary rounded-pill w-100 mt-4 ${isRegistering ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl transition duration-300'}`}>Register</button>
+              <button type="submit" disabled={isRegistering} className={`btn btn-outline-primary rounded-pill w-100 mt-4 ${isRegistering ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl transition duration-300'}`}><i className="fa fa-user-plus me-2"></i>Register</button>
             </form>
           </div>
         </div>
