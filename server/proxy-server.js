@@ -1,18 +1,31 @@
 import 'dotenv/config.js';
 import express from 'express';
-import cors from 'cors';
+//import cors from 'cors';
 import axios from 'axios';
 import medications from './routes/medication.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const port = process.env.PORT || 3001;
 
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
+
+console.log(__dirname);
+
+
+const distPath = path.join(__dirname, '../client/build');
+app.use(express.static(distPath));
+
 // Middleware
-app.use(cors());
+//app.use(cors());
 app.use(express.json());
 app.use("/medication", medications);
 
 // Routes
+
+
 app.get('/', (req, res) => {
   res.send('Hello from the server!');
 });
@@ -35,6 +48,12 @@ app.get('/api/medication', async (req, res) => {
     res.status(500).send(error.message);
   }  
 });
+
+app.get('/*splat', (req, res) => {
+  res.sendFile('index.html', {root : distPath});
+});
+
+
 
 // Start server
 app.listen(port, () => {
