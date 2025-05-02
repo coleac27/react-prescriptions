@@ -22,9 +22,10 @@ export default function MedlineRequest({medicationModalName, setMedication}) {
       'informationRecipient.languageCode.c': 'en'
     });
     
-    const XMLData = `http://localhost:3001/api/medication?${params.toString()}`;
+    //const XMLData = `http://localhost:3001/api/medication?${params.toString()}`;
+    const XMLData = `https://prescriptions-s-1ab18da7a595.herokuapp.com/api/medication?${params.toString()}`;
   
-    console.log('Request URL:', XMLData); // Add this to debug
+    //console.log('Request URL:', XMLData);
 
     axios.get(XMLData)
     .then((response) => {

@@ -7,7 +7,6 @@ export default function Navbar() {
 
   const { userLoggedIn, user } = useAuth();
   const navigate = useNavigate();
-  console.log("USER", user);
 
     return (
       <nav className="navbar navbar-expand-lg navbar-light shadow">

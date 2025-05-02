@@ -2,14 +2,10 @@ import React from 'react'
 
 export default function MedlineResponse (props) {
 
-
-  console.log("props",props.medication)
-
   let medlineResponse = [];
 
     const xmlDocument = new DOMParser().parseFromString(props.medication, 'text/xml');
 
-    console.log("xmlDocument", xmlDocument);
     const entries = xmlDocument.querySelectorAll('entry');
 
     for (const entry of entries) {
@@ -23,12 +19,10 @@ export default function MedlineResponse (props) {
       const hrefValue = medicineEntry.link.getAttribute("href");
       medicineEntry.link = hrefValue;
 
-      console.log(`Name: ${medicineEntry.name}, Link: ${medicineEntry.link}, Summary: ${medicineEntry.summary}`);
+      //console.log(`Name: ${medicineEntry.name}, Link: ${medicineEntry.link}, Summary: ${medicineEntry.summary}`);
       
       medlineResponse.push(medicineEntry);
     }
-
-    console.log("medlineResponse", medlineResponse);
 
   return (
     <div>

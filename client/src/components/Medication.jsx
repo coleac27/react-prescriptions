@@ -22,7 +22,8 @@ export default function Medication() {
       if(!id) return;
       setIsNew(false);
       const response = await fetch(
-        `http://localhost:3001/medication/${params.id.toString()}`
+        //`http://localhost:3001/medication/${params.id.toString()}`
+        `https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${params.id.toString()}`
       );
       if (!response.ok) {
         const message = `An error has occurred: ${response.statusText}`;
@@ -37,8 +38,7 @@ export default function Medication() {
       }
       // Determine if it's a custom time or predefined option
       const isCustomTime = !["Morning", "Midday", "Dinnertime", "Bedtime"].includes(medication.timeOfDay);
-        console.log("isCustomTime", isCustomTime);
-        console.log("medication.timeOfDay", medication.timeOfDay);
+
       setForm({
         medicationName: medication.medicationName,
         timeOfDay: isCustomTime ? "Other" : medication.timeOfDay,
@@ -47,7 +47,6 @@ export default function Medication() {
         pharmacy: medication.pharmacy,
         notes: medication.notes
       });
-      console.log("form", form);
     }
     fetchData();
     return;
@@ -70,7 +69,8 @@ export default function Medication() {
       let response;
       if (isNew) {
         // if we are adding a new record we will POST to /medication.
-        response = await fetch("http://localhost:3001/medication", {
+        //response = await fetch("http://localhost:3001/medication", {
+          response = await fetch("https://prescriptions-s-1ab18da7a595.herokuapp.com/medication", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -79,7 +79,8 @@ export default function Medication() {
         });
       } else {
         // if we are updating a record we will PATCH to /record/:id.
-        response = await fetch(`http://localhost:3001/medication/${params.id}`, {
+        //response = await fetch(`http://localhost:3001/medication/${params.id}`, {
+          response = await fetch(`https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${params.id}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",

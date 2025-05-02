@@ -1,4 +1,3 @@
-// const { MongoClient, ServerApiVersion } = require('mongodb');
 import { MongoClient, ServerApiVersion } from "mongodb";
 
 const uri = process.env.DATABASE || "";
@@ -12,7 +11,6 @@ const client = new MongoClient(uri, {
 });
 
 try {
-    // Connect the client to the server
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("prescription-tracker").command({ ping: 1 });

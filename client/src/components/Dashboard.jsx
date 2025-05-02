@@ -40,7 +40,6 @@ const Medication= (props) => (
         >
           Delete
         </button>
-        {/* <button onClick={() => props.setIsModalOpen(true)}>Open Modal</button> */}
           <MedlineModal 
             isModalOpen={props.isModalOpen}
             onClose={() => props.setIsModalOpen(false)}
@@ -58,7 +57,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getMedications() {
-      const response = await fetch(`http://localhost:3001/medication/`);
+      //const response = await fetch(`http://localhost:3001/medication/`);
+      const response = await fetch(`https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -66,14 +66,15 @@ export default function Dashboard() {
       }
       const medications = await response.json();
       setMedications(medications);
-      console.log(medications);
+      //console.log(medications);
     }
     getMedications();
     return;
   }, [medications.length]);
 
   async function deleteMedication(id) {
-    await fetch(`http://localhost:3001/medication/${id}`, {
+    //await fetch(`http://localhost:3001/medication/${id}`, {
+    await fetch(`https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${id}`, {
       method: "DELETE",
     });
     const newMedications = medications.filter((el) => el._id !== id);

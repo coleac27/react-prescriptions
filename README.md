@@ -3,8 +3,8 @@
 ### remove id display             x
 ### add medline to dashboard      x
 ### form validation
-### host on heroku
-### reinstate authentification
+### host on heroku                x
+### reinstate authentication      x
 
 
 
