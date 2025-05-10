@@ -1,6 +1,6 @@
-import { NavLink, Navigate, Link } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/authContext';
+import { useAuth, getToken } from '../contexts/authContext';
 import MedlineModal from './MedlineModal';
 
 const Medication= (props) => (
@@ -8,7 +8,7 @@ const Medication= (props) => (
     {/* <td className="">
       {props.medication._id}
     </td> */}
-    <td className="" role="button" onClick={() => props.setIsModalOpen(true)}>
+    <td className="" role="button" onClick={() => props.openModal(props.medication._id)}>
       {props.medication.medicationName}
     </td>
     <td className="">
@@ -41,8 +41,8 @@ const Medication= (props) => (
           Delete
         </button>
           <MedlineModal 
-            isModalOpen={props.isModalOpen}
-            onClose={() => props.setIsModalOpen(false)}
+            isModalOpen={props.activeModalId === props.medication._id}
+            onClose={() => props.closeModal()}
             medicationName={props.medication.medicationName}
           />
       </div>
@@ -53,33 +53,104 @@ const Medication= (props) => (
 
 export default function Dashboard() {
   const [medications, setMedications] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeModalId, setActiveModalId] = useState(null); 
+  const { user, refreshToken } = useAuth();
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    async function updateToken() {
+      if (user) {
+        try {
+          const currentToken = await getToken();
+          setToken(currentToken);
+        } catch (error) {
+          console.error("Error getting token:", error);
+        }
+      }
+    }
+    updateToken();
+  }, [user]);
+
+  // Function to handle API calls with token refresh if needed
+  async function makeAuthenticatedRequest(url, options) {
+    try {
+      // First attempt with current token
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      // If unauthorized, try refreshing token and retry once
+      if (response.status === 401) {
+        console.log("Token expired, refreshing...");
+        await refreshToken();
+        const newToken = await getToken();
+        setToken(newToken);
+        
+        // Retry with new token
+        return fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            "Authorization": `Bearer ${newToken}`
+          }
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("Request failed:", error);
+      throw error;
+    }
+  }
 
   useEffect(() => {
     async function getMedications() {
-      //const response = await fetch(`http://localhost:3001/medication/`);
-      const response = await fetch(`https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/`);
-      if (!response.ok) {
-        const message = `An error occurred: ${response.statusText}`;
-        console.error(message);
-        return;
+      if (!token) return;
+
+      try {
+        const response = await makeAuthenticatedRequest(
+        // `http://localhost:3001/medication/`, {
+        `https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/`, {
+            method: "GET"}
+          );
+        if (!response.ok) {
+          const message = `An error occurred: ${response.statusText}`;
+          console.error(message);
+          return;
+        }
+        const medications = await response.json();
+        setMedications(medications);
+        //console.log(medications);
+      } catch (error) {
+        console.error("Error fetching medications:", error);
       }
-      const medications = await response.json();
-      setMedications(medications);
-      //console.log(medications);
     }
     getMedications();
-    return;
-  }, [medications.length]);
+  }, [token]);
 
   async function deleteMedication(id) {
-    //await fetch(`http://localhost:3001/medication/${id}`, {
-    await fetch(`https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${id}`, {
-      method: "DELETE",
-    });
+    await makeAuthenticatedRequest(
+    // `http://localhost:3001/medication/${id}`, {
+    `https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${id}`, {
+      method: "DELETE"}
+    );
     const newMedications = medications.filter((el) => el._id !== id);
     setMedications(newMedications);
   }
+
+  // Open modal for a specific medication
+  const openModal = (id) => {
+    setActiveModalId(id);
+  };
+
+  // Close any open modal
+  const closeModal = () => {
+    setActiveModalId(null);
+  };
 
   // This method will map out the records on the table
   function medicationList() {
@@ -88,8 +159,9 @@ export default function Dashboard() {
       return (
         <Medication
           medication={medication}
-          isModalOpen={isModalOpen} 
-          setIsModalOpen={setIsModalOpen}
+          activeModalId={activeModalId}
+          openModal={openModal}
+          closeModal={closeModal}
           deleteMedication={() => deleteMedication(medication._id)}
           key={medication._id}
         />

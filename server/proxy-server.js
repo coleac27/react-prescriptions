@@ -5,6 +5,7 @@ import axios from 'axios';
 import medications from './routes/medication.js';
 //import path from 'path'; //distributed by server
 //import { fileURLToPath } from 'url'; //distributed by server
+import { authenticate } from './firebase/firebase.js';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -20,10 +21,14 @@ app.use(cors());
 app.use(express.json());
 app.use("/medication", medications);
 
+app.use(authenticate);
+
 // Routes
 app.get('/', (req, res) => {
   res.send('Hello from the server!');
 });
+
+app.use(authenticate);
 
 app.get('/api/medication', async (req, res) => {
   try {
@@ -47,7 +52,6 @@ app.get('/api/medication', async (req, res) => {
 // app.get('/*splat', (req, res) => {
 //   res.sendFile('index.html', {root : distPath});
 // }); //distributed by server
-
 
 
 // Start server

@@ -1,13 +1,13 @@
 import { NavLink, Navigate } from 'react-router-dom'
-import React, { useState } from 'react'
-// import { auth } from '../firebase/firebaseConfig'
-// import { signInWithEmailAndPassword  } from "firebase/auth";
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/authContext';
 import { doSignInWithEmailAndPassword, doSignInWithGoogle } from '../firebase/auth';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 export default function Login() {
   const { userLoggedIn } = useAuth();
 
+  const [activeModalId, setActiveModalId] = useState(null); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -25,7 +25,6 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try{
-      //const user = await signInWithEmailAndPassword(auth, email, password);
       if(!isSigningIn){
         setIsSigningIn(true);
         await doSignInWithEmailAndPassword(email, password);
@@ -54,8 +53,17 @@ export default function Login() {
       setIsSigningIn(false);
       console.log(errorCode, errorMessage);
     };
-
   }
+
+    // Open modal for a specific medication
+    const openModal = (e) => {
+      setActiveModalId(e.target.id);
+    };
+  
+    // Close any open modal
+    const closeModal = () => {
+      setActiveModalId(null);
+    };
 
   return (
     <div>
@@ -72,16 +80,23 @@ export default function Login() {
             <h1 className="display-6 fw-bolder mb-5">Login</h1>
             <form onSubmit={handleLogin}>
               <div className="mb-3">
-                <label for="exampleInputEmail1" className="form-label">Email address</label>
-                <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={handleEmailChange}/>
+                <label for="inputEmail1" className="form-label">Email address</label>
+                <input type="email" className="form-control" id="inputEmail1" aria-describedby="emailHelp" onChange={handleEmailChange}/>
               </div>
               <div className="mb-3">
-                <label for="exampleInputPassword1" className="form-label">Password</label>
-                <input type="password" className="form-control" id="exampleInputPassword1" onChange={handlePasswordChange}/>
+                <label for="inputPassword1" className="form-label">Password</label>
+                <input type="password" className="form-control" id="inputPassword1" onChange={handlePasswordChange}/>
               </div>
               {errorMessage && (
-                <span className='text-red-600 font-bold'>{errorMessage}</span>
+                <span className="text-danger font-weight-bold">{errorMessage}</span>
               )}
+              <div className="d-flex justify-content-end">
+                <p style={{cursor:"pointer"}} id="resetPassword1" onClick={openModal}>Forgot Password?</p>
+                <ForgotPasswordModal 
+                  isModalOpen={activeModalId}
+                  onClose={() => closeModal()}
+                />
+              </div>
               <button type="submit" disabled={isSigningIn} className="btn btn-outline-primary rounded-pill w-100 mt-4"><i className="fa fa-sign-in me-2"></i>Login</button>
             </form>
             <div className="fw-bolder text-center mt-3">OR</div>

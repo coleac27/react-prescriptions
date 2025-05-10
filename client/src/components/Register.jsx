@@ -25,7 +25,6 @@ export default function Register() {
     e.preventDefault();
   
     try{
-  //  const user = await createUserWithEmailAndPassword(auth, email, password);
       if(!isRegistering){
         setIsRegistering(true)
         await doCreateUserWithEmailAndPassword(email, password)
@@ -55,7 +54,7 @@ export default function Register() {
 
   return (
     <div>
-      {userLoggedIn && (<Navigate to={'/home'} replace={true} />)}
+      {userLoggedIn && (<Navigate to={'/'} replace={true} />)}
       <div className="container shadow my-5">
         <div className="row justify-content-end">
           <div className="col-md-5 d-flex flex-column align-items-center text-white justify-content-center form order-2">

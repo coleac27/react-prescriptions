@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
+import { useAuth, getToken } from '../contexts/authContext';
 
 export default function Medication() {
+
+  const { user, userLoggedIn, refreshToken } = useAuth();
+  const [token, setToken] = useState("");
 
   const [form, setForm] = useState({
     medicationName: "",
@@ -11,46 +15,99 @@ export default function Medication() {
     pharmacy: "",
     notes: ""
   });
-
   const [isNew, setIsNew] = useState(true);
+  
   const params = useParams();
   const navigate = useNavigate();
 
+   // Get token when component mounts or user changes
   useEffect(() => {
-    async function fetchData() {
-      const id = params.id?.toString() || undefined;
-      if(!id) return;
-      setIsNew(false);
-      const response = await fetch(
-        //`http://localhost:3001/medication/${params.id.toString()}`
-        `https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${params.id.toString()}`
-      );
-      if (!response.ok) {
-        const message = `An error has occurred: ${response.statusText}`;
-        console.error(message);
-        return;
+    async function fetchToken() {
+      if (user) {
+        try {
+          const fetchedToken = await getToken();
+          setToken(fetchedToken);
+        } catch (error) {
+          console.error("Error fetching token:", error);
+        }
       }
-      const medication = await response.json();
-      if (!medication) {
-        console.warn(`Record with id ${id} not found`);
-        navigate("/");
-        return;
-      }
-      // Determine if it's a custom time or predefined option
-      const isCustomTime = !["Morning", "Midday", "Dinnertime", "Bedtime"].includes(medication.timeOfDay);
+    }
+    fetchToken();
+  }, [user]);
 
-      setForm({
-        medicationName: medication.medicationName,
-        timeOfDay: isCustomTime ? "Other" : medication.timeOfDay,
-        timeOfDayOther: isCustomTime ? medication.timeOfDay : "",
-        dosage: medication.dosage,
-        pharmacy: medication.pharmacy,
-        notes: medication.notes
+  // Function to handle API calls with token refresh if needed
+  async function makeAuthenticatedRequest(url, options) {
+    try {
+      // First attempt with current token
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          "Authorization": `Bearer ${token}`
+        }
       });
+      
+      // If unauthorized, try refreshing token and retry once
+      if (response.status === 401) {
+        console.log("Token expired, refreshing...");
+        await refreshToken();
+        const newToken = await getToken();
+        setToken(newToken);
+        
+        // Retry with new token
+        return fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            "Authorization": `Bearer ${newToken}`
+          }
+        });
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("Request failed:", error);
+      throw error;
+    }
+  }
+
+  useEffect(() => {
+    if(!token || !params.id) return;
+
+    async function fetchData() {
+      setIsNew(false);
+      try {
+        const response = await makeAuthenticatedRequest(
+          //`http://localhost:3001/medication/${params.id.toString()}`, {
+          `https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${params.id.toString()}`, {
+            method: "GET"}
+          );
+        if (!response.ok) {
+          throw new Error(`An error has occurred: ${response.statusText}`);
+        }
+        const medication = await response.json();
+        if (!medication) {
+          console.warn(`Record not found`);
+          navigate("/");
+          return;
+        }
+        // Determine if it's a custom time or predefined option
+        const isCustomTime = !["Morning", "Midday", "Dinnertime", "Bedtime"].includes(medication.timeOfDay);
+
+        setForm({
+          medicationName: medication.medicationName,
+          timeOfDay: isCustomTime ? "Other" : medication.timeOfDay,
+          timeOfDayOther: isCustomTime ? medication.timeOfDay : "",
+          dosage: medication.dosage,
+          pharmacy: medication.pharmacy,
+          notes: medication.notes
+        });
+      } catch (error) {
+        console.error("Error fetching medication:", error);
+      }
     }
     fetchData();
-    return;
-  }, [params.id, navigate]);
+  }, [params.id, navigate, token]);
 
   // These methods will update the state properties.
   function updateForm(value) {
@@ -69,21 +126,23 @@ export default function Medication() {
       let response;
       if (isNew) {
         // if we are adding a new record we will POST to /medication.
-        //response = await fetch("http://localhost:3001/medication", {
-          response = await fetch("https://prescriptions-s-1ab18da7a595.herokuapp.com/medication", {
+        response = await makeAuthenticatedRequest(
+          //"http://localhost:3001/medication", {
+          "https://prescriptions-s-1ab18da7a595.herokuapp.com/medication", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(medication),
         });
       } else {
         // if we are updating a record we will PATCH to /record/:id.
-        //response = await fetch(`http://localhost:3001/medication/${params.id}`, {
-          response = await fetch(`https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${params.id}`, {
+        response = await makeAuthenticatedRequest(
+          //`http://localhost:3001/medication/${params.id}`, {
+          `https://prescriptions-s-1ab18da7a595.herokuapp.com/medication/${params.id}`, {
           method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(medication),
         });
@@ -109,6 +168,7 @@ export default function Medication() {
   // This following section will display the form that takes the input from the user.
   return (
     <>
+      {!userLoggedIn && (<Navigate to={'/login'} replace={true} />)}
       <h3 className="text-lg font-weight-bold p-4">Create/Update Medication Record</h3>
       <div className="card mx-auto">
         <div className="card-body">

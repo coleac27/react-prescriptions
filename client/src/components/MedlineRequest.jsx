@@ -1,17 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth, getToken } from '../contexts/authContext';
 
 export default function MedlineRequest({medicationModalName, setMedication}) {
   const [medicationName, setMedicationName] = useState(medicationModalName ?? "");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const [token, setToken] = useState("");
 
   function submitHandler(e) {
     e.preventDefault();
   }
 
   useEffect(() => {
-    if (!medicationName){return;}
+    async function fetchToken() {
+      if (user) {
+        try {
+          const fetchedToken = await getToken();
+          console.log("Token fetched:", fetchedToken);
+          setToken(fetchedToken);
+        } catch (error) {
+          console.error("Error fetching token:", error);
+        }
+      }
+    }
+    fetchToken();
+  }, [user]);
+
+  useEffect(() => {
+    if (!medicationName)return;
+    if(!token) return;
 
     setLoading(true);
     setError(null);
@@ -27,7 +46,11 @@ export default function MedlineRequest({medicationModalName, setMedication}) {
   
     //console.log('Request URL:', XMLData);
 
-    axios.get(XMLData)
+    axios.get(XMLData, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
     .then((response) => {
       // console.log('Your xml response', response.data);
       setMedication(response.data);
@@ -38,7 +61,7 @@ export default function MedlineRequest({medicationModalName, setMedication}) {
       .finally(() => {
         setLoading(false);
     });
-  }, [medicationName]);
+  }, [medicationName, token]);
 
   return (
     <div>

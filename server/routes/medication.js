@@ -2,15 +2,19 @@ import dotenv from 'dotenv';
 import express from 'express';
 import db from '../db/connection.js';
 import { ObjectId } from 'mongodb';
+import { authenticate } from '../firebase/firebase.js';
 
 dotenv.config({path: '../.env'});
 
 const router = express.Router();
 
+router.use(authenticate);
+
 // List of all the records.
 router.get("/", async (req, res) => {
   let collection = await db.collection("medications");
-  let results = await collection.find({}).toArray();
+  let query = { userId: req.user.uid };
+  let results = await collection.find(query).toArray();
   res.send(results).status(200);
 });
 
@@ -33,6 +37,7 @@ router.post("/", async (req, res) => {
       timeOfDay: req.body.timeOfDay,
       pharmacy: req.body.pharmacy,
       notes: req.body.notes,
+      userId: req.user.uid
     };
     let collection = await db.collection("medications");
     let result = await collection.insertOne(newDocument);
@@ -54,6 +59,7 @@ router.patch("/:id", async (req, res) => {
       timeOfDay: req.body.timeOfDay,
       pharmacy: req.body.pharmacy,
       notes: req.body.notes,
+      userId: req.user.uid
       },
     };
 
